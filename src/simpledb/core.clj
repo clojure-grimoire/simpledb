@@ -23,8 +23,9 @@
 
 (defn update! [cfg k f & args]
   (let [*db* (:db cfg)]
-    (clojure.core/get 
-     (swap! *db* #(assoc % k (apply f (clojure.core/get % k) args))) 
+    (assert *db* "Null database atom!")
+    (clojure.core/get
+     (swap! *db* #(assoc % k (apply f (clojure.core/get % k) args)))
      k)))
 
 ;; Backing file operations
@@ -50,9 +51,9 @@
         true))))
 
 (defn clear! [cfg]
-  (let [db (:db cfg)])
-  (reset! db {})
-  (persist-db cfg))
+  (let [db (:db cfg)]
+    (reset! db {})
+    (flush! cfg)))
 
 (defn- compute-interval [[i t]]
   {:pre [(#{:seconds :minutes :hours :days} i)
@@ -70,7 +71,7 @@
   (let [timer    (:timer cfg)
         _        (assert timer)
         interval (:interval cfg)
-        interval (-compute-interval interval)]
+        interval (compute-interval interval)]
     (assert (not (.isShutDown timer)) "Timer is shut down, db connection is closed!")
     (. timer (scheduleAtFixedRate (partial flush! cfg) interval interval (. TimeUnit SECONDS)))))
 
@@ -82,12 +83,12 @@
 
 (defn init! [& [cfg?]]
   (let [;; Destructure configuration with defaults
-        file     (get cfg? :file     "./sdb.db")
-        interval (get cfg? :interval [:minutes 5])
+        file     (clojure.core/get cfg? :file     "./sdb.db")
+        interval (clojure.core/get cfg? :interval [:minutes 5])
         _        (assert (vector? interval))
         _        (assert (#{:minutes :seconds :hours} (first interval)))
         _        (assert (number? (second interval)))
-        log-fn   (get cfg? :log-fn   println)
+        log-fn   (clojure.core/get cfg? :log-fn   println)
         _        (assert (fn? log-fn))
 
         ;; Set up final values
@@ -100,4 +101,5 @@
                   :timer    timer
                   :interval interval
                   :log-fn   log-fn}]
-    (read! cfg)))
+    (read! cfg)
+    cfg))
