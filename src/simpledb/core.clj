@@ -102,4 +102,5 @@
                   :interval interval
                   :log-fn   log-fn}]
     (read! cfg)
+    (start! cfg)
     cfg))
