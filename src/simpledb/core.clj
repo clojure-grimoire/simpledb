@@ -58,7 +58,7 @@
 (defn- compute-interval [[i t]]
   {:pre [(#{:seconds :minutes :hours :days} i)
          (number? t)
-         (> 0 t)]}
+         (> t 0)]}
   (case i
     (:seconds) (long t)
     (:minutes) (recur [:seconds (* t 60)])
