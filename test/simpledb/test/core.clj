@@ -1,26 +1,28 @@
 (ns simpledb.test.core
+  (:refer-clojure :exclude [get get-in])  
   (:use [simpledb.core])
   (:use [clojure.test]))
 
-(deftest replace-me ;; FIXME: write
-  (is false "No tests have been written."))
+(def cfg (init!))
 
-(defn write-test []
+(start! cfg)
+
+(deftest write-test 
   (let [t (System/currentTimeMillis)]
     (loop [iter 0]
       (if (>= (- (System/currentTimeMillis) t) 1000)
         (println iter)
         (do
-          (store! iter iter)
+          (put! cfg iter iter)
           (recur (inc iter)))))))
 
-(defn read-test []
+(deftest read-test 
   (let [t (System/currentTimeMillis)]
     (loop [iter 0]
       (if (>= (- (System/currentTimeMillis) t) 1000)
         (println iter)
         (do
-          (get iter)
+          (get cfg iter)
           (recur (inc iter)))))))
 
 
