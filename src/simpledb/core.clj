@@ -58,7 +58,7 @@
 (defn- compute-interval [[i t]]
   {:pre [(#{:seconds :minutes :hours :days} i)
          (number? t)
-         (> 0 t)]}
+         (> t 0)]}
   (case i
     (:seconds) (long t)
     (:minutes) (recur [:seconds (* t 60)])
@@ -72,7 +72,7 @@
         _        (assert timer)
         interval (:interval cfg)
         interval (compute-interval interval)]
-    (assert (not (.isShutDown timer)) "Timer is shut down, db connection is closed!")
+    (assert (not (.isShutdown timer)) "Timer is shut down, db connection is closed!")
     (. timer (scheduleAtFixedRate (partial flush! cfg) interval interval (. TimeUnit SECONDS)))))
 
 (defn stop! [cfg]
