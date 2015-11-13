@@ -31,9 +31,10 @@
 ;; Backing file operations
 ;;------------------------------------------------------------------------------
 (defn flush! [cfg]
-  (let [*db* (:db cfg)
-        cur  @*db*]
-    (println "SimpleDB: Persisting " (count cur) " keys.")
+  (let [*db*   (:db cfg)
+        log-fn (:log-fn cfg)
+        cur    @*db*]
+    (log-fn (str "SimpleDB: Persisting " (count cur) " keys."))
     (spit (:file cfg) (pr-str cur))))
 
 (defn read! [cfg]
