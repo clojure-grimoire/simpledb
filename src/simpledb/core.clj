@@ -89,7 +89,7 @@
         _        (assert (vector? interval))
         _        (assert (#{:minutes :seconds :hours} (first interval)))
         _        (assert (number? (second interval)))
-        log-fn   (clojure.core/get cfg? :log-fn (fn [&] nil))
+        log-fn   (clojure.core/get cfg? :log-fn (fn [& _] nil))
         _        (assert (fn? log-fn))
 
         ;; Set up final values
