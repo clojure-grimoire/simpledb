@@ -92,7 +92,7 @@
         _        (assert (fn? log-fn))
 
         ;; Set up final values
-        db       (atom {})
+        db       (clojure.core/get cfg? :db (atom nil))
         timer    (. Executors newScheduledThreadPool 1)
 
         ;; Final configuration
