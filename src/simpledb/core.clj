@@ -91,7 +91,7 @@
      of #{:minutes :seconds :hours} and the number is how long in those
      to wait between writes.
 
-   - :log-fn is a function of one argument to be called when logging
+   - :log-fn is a function of several arguments to be called when logging
      messages are generated, being a read, write start or shutdown.
 
    - :db is the atom to be used as the backing reference
