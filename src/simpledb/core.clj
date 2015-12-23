@@ -81,26 +81,45 @@
     (. timer (shutdown))
     (dissoc cfg :timer :db)))
 
-(defn init! [& [cfg?]]
-  (let [;; Destructure configuration with defaults
-        file     (clojure.core/get cfg? :file     "./sdb.db")
-        interval (clojure.core/get cfg? :interval [:minutes 5])
-        _        (assert (vector? interval))
-        _        (assert (#{:minutes :seconds :hours} (first interval)))
-        _        (assert (number? (second interval)))
-        log-fn   (clojure.core/get cfg? :log-fn   println)
-        _        (assert (fn? log-fn))
+(defn init!
+  "Initializes a database.
 
-        ;; Set up final values
-        db       (clojure.core/get cfg? :db (atom nil))
+  Accepts an optional map of settings
+   - :file is the file to & from which the db will be written
+
+   - :interval is the rate as a keyword, num pair w here the kw is one
+     of #{:minutes :seconds :hours} and the number is how long in those
+     to wait between writes.
+
+   - :log-fn is a function of one argument to be called when logging
+     messages are generated, being a read, write start or shutdown.
+
+   - :db is the atom to be used as the backing reference
+
+   - :no-slurp disables the default initial slurp of the database
+     into the backing atom."
+
+  {:arglists '([] [{:keys [db file interval log-fn no-slurp]}])}
+  [& [{:keys [file interval log-fn no-slurp db]
+       :or   {file     "sdb.db"
+              interval [:minutes 5]
+              log-fn   println
+              no-slurp false}}]]
+  (assert (vector? interval))
+  (assert (#{:minutes :seconds :hours} (first interval)))
+  (assert (number? (second interval)))
+  (assert (fn? log-fn))
+  
+  (let [user-db  db
         timer    (. Executors newScheduledThreadPool 1)
 
         ;; Final configuration
-        cfg      {:db       db
+        cfg      {:db       (or user-db (atom {}))
                   :file     file
                   :timer    timer
                   :interval interval
                   :log-fn   log-fn}]
-    (read! cfg)
+    (when-not no-slurp
+      (read! cfg))
     (start! cfg)
     cfg))
