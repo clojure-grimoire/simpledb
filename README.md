@@ -12,7 +12,7 @@ get something else unless you're a lazy bastard like me.
 If you must:
 
 ```Clojure
-;; FIXME: add a demo
+lein test
 ```
 
 ## License

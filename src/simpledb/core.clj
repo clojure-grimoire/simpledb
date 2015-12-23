@@ -31,9 +31,10 @@
 ;; Backing file operations
 ;;------------------------------------------------------------------------------
 (defn flush! [cfg]
-  (let [*db* (:db cfg)
-        cur  @*db*]
-    (println "SimpleDB: Persisting " (count cur) " keys.")
+  (let [*db*   (:db cfg)
+        log-fn (:log-fn cfg)
+        cur    @*db*]
+    (log-fn (str "SimpleDB: Persisting " (count cur) " keys."))
     (spit (:file cfg) (pr-str cur))))
 
 (defn read! [cfg]
@@ -103,7 +104,7 @@
   [& [{:keys [file interval log-fn no-slurp db]
        :or   {file     "sdb.db"
               interval [:minutes 5]
-              log-fn   println
+              log-fn   (fn [& _] nil)
               no-slurp false}}]]
   (assert (vector? interval))
   (assert (#{:minutes :seconds :hours} (first interval)))
