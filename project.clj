@@ -1,4 +1,4 @@
-(defproject org.clojure-grimoire/simpledb "0.1.10"
+(defproject org.clojure-grimoire/simpledb "0.1.11"
   :description "A simple in-memory database for use with prototypes."
   :url "http://github.com/clojure-grimoire/simpledb"
   :license {:name "Eclipse Public License"
