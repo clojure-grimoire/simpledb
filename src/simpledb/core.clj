@@ -1,7 +1,8 @@
 (ns simpledb.core
   (:refer-clojure :exclude [get get-in])
   (:import java.util.concurrent.TimeUnit
-           java.util.concurrent.Executors))
+           java.util.concurrent.Executors
+           java.io.FileWriter))
 
 (defn put! [cfg k v]
   (let [*db* (:db cfg)]
@@ -30,14 +31,14 @@
 
 ;; Backing file operations
 ;;------------------------------------------------------------------------------
-(defn flush! [cfg]
+(defn flush! [{:keys [log-fn file] :as cfg}]
   (let [*db*   (:db cfg)
-        log-fn (:log-fn cfg)
         cur    @*db*]
     (log-fn (str "SimpleDB: Persisting " (count cur) " keys."))
     (binding [*print-length* nil
-              *print-level* nil]
-      (spit (:file cfg) (pr-str cur)))))
+              *print-level*  nil
+              *out*          (FileWriter. file)]
+      (prn cur))))
 
 (defn read! [cfg]
   (let [*db*    (:db cfg)
