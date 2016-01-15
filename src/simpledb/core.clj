@@ -1,5 +1,6 @@
 (ns simpledb.core
-  (:refer-clojure :exclude [get get-in]))
+  (:refer-clojure :exclude [get get-in])
+  (:import java.io.FileWriter))
 
 (defn put! [cfg k v]
   (let [*db* (:db cfg)]
@@ -28,19 +29,19 @@
 
 ;; Backing file operations
 ;;------------------------------------------------------------------------------
-(defn flush! [cfg]
-  (let [*db*   (:db cfg)
-        log-fn (:log-fn cfg)
-        lock   (::lock cfg)
-        cur    @*db*]
+(defn flush! [{:keys [db file log-fn] :as cfg}]
+  (let [lock   (::lock cfg)
+        cur    @db]
     (locking lock
       (log-fn (str "SimpleDB: Persisting " (count cur) " keys."))
-      (spit (:file cfg) (pr-str cur)))))
+      (binding [*print-length* nil
+                *print-level*  nil
+                *out*          (FileWriter. file)]
+        (prn cur)))))
 
 (defn read! [cfg]
   (let [*db*    (:db cfg)
         log-fn  (:log-fn cfg)
-        lock    (::lock cfg)
         content (try
                   (read-string (slurp (:file cfg)))
                   (catch Exception e
